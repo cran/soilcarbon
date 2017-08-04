@@ -24,17 +24,20 @@ read.soilcarbon<-function(file, template=F){
   metadata<-read.xlsx(file , sheet="metadata")
   site<-read.xlsx(file , sheet="site")
   profile<-read.xlsx(file , sheet="profile")
-  layer<-read.xlsx(file , sheet="layer")
+  layer<-read.xlsx(file , sheet="layer", check.names=T)
   fraction<-read.xlsx(file , sheet="fraction")
 
   data_workbook=list(metadata=metadata, site=site, profile=profile, layer=layer, fraction=fraction)
+  data_workbook<-lapply(data_workbook, function(x) x<-x[-1:-2,])
+
 
   #remove empty rows
   if (template==F){
   for (i in 1:length(data_workbook)){
     data<-data_workbook[[i]]
-    data[data == c(" ")]<-NA
-    data[data == c("")]<-NA
+      for (j in 1:ncol(data)){
+     data[,j][grep("^[ ]+$", data[,j])]<-NA
+      }
     data_workbook[[i]]<-data
     data_workbook[[i]]<-data_workbook[[i]][rowSums(is.na(data_workbook[[i]])) != ncol(data_workbook[[i]]),]
 
